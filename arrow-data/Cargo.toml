@@ -45,8 +45,8 @@ force_validate = []
 
 [dependencies]
 
-arrow-buffer = { version = "32.0.0", path = "../arrow-buffer" }
-arrow-schema = { version = "32.0.0", path = "../arrow-schema" }
+arrow-buffer = {path = "../arrow-buffer" }
+arrow-schema = {path = "../arrow-schema" }
 
 num = { version = "0.4", default-features = false, features = ["std"] }
 half = { version = "2.1", default-features = false }

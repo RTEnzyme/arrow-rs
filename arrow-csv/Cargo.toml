@@ -38,11 +38,11 @@ path = "src/lib.rs"
 bench = false
 
 [dependencies]
-arrow-array = { version = "32.0.0", path = "../arrow-array" }
-arrow-buffer = { version = "32.0.0", path = "../arrow-buffer" }
-arrow-cast = { version = "32.0.0", path = "../arrow-cast" }
-arrow-data = { version = "32.0.0", path = "../arrow-data" }
-arrow-schema = { version = "32.0.0", path = "../arrow-schema" }
+arrow-array = {path = "../arrow-array" }
+arrow-buffer = {path = "../arrow-buffer" }
+arrow-cast = {path = "../arrow-cast" }
+arrow-data = {path = "../arrow-data" }
+arrow-schema = {path = "../arrow-schema" }
 chrono = { version = "0.4.23", default-features = false, features = ["clock"] }
 csv = { version = "1.1", default-features = false }
 csv-core = { version = "0.1"}

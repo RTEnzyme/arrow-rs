@@ -38,10 +38,10 @@ path = "src/lib.rs"
 bench = false
 
 [dependencies]
-arrow-buffer = { version = "32.0.0", path = "../arrow-buffer" }
-arrow-data = { version = "32.0.0", path = "../arrow-data" }
-arrow-schema = { version = "32.0.0", path = "../arrow-schema" }
-arrow-array = { version = "32.0.0", path = "../arrow-array" }
+arrow-buffer = {path = "../arrow-buffer" }
+arrow-data = {path = "../arrow-data" }
+arrow-schema = {path = "../arrow-schema" }
+arrow-array = {path = "../arrow-array" }
 num = { version = "0.4", default-features = false, features = ["std"] }
 
 [features]

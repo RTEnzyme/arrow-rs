@@ -45,15 +45,16 @@ ahash = { version = "0.8", default-features = false, features = ["compile-time-r
 ahash = { version = "0.8", default-features = false, features = ["runtime-rng"] }
 
 [dependencies]
-arrow-buffer = { version = "32.0.0", path = "../arrow-buffer" }
-arrow-schema = { version = "32.0.0", path = "../arrow-schema" }
-arrow-data = { version = "32.0.0", path = "../arrow-data" }
+arrow-buffer = {path = "../arrow-buffer" }
+arrow-schema = {path = "../arrow-schema" }
+arrow-data = {path = "../arrow-data" }
 chrono = { version = "0.4.23", default-features = false, features = ["clock"] }
 chrono-tz = { version = "0.8", optional = true }
 num = { version = "0.4", default-features = false, features = ["std"] }
 half = { version = "2.1", default-features = false, features = ["num-traits"] }
 hashbrown = { version = "0.13", default-features = false }
 packed_simd = { version = "0.3", default-features = false, optional = true, package = "packed_simd_2" }
+tracing = "0.1"
 
 [features]
 simd = ["packed_simd"]
