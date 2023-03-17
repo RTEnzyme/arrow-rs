@@ -20,6 +20,8 @@
 
 use crate::{new_empty_array, Array, ArrayRef, StructArray};
 use arrow_schema::{ArrowError, DataType, Field, Schema, SchemaRef};
+use tracing::{span, info, Level};
+use std::time::Instant;
 use std::ops::Index;
 use std::sync::Arc;
 
