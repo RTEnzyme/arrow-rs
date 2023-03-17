@@ -686,6 +686,7 @@ pub fn read_dictionary(
             let schema = Schema {
                 fields: vec![Field::new("", value_type.as_ref().clone(), true)],
                 metadata: HashMap::new(),
+                fields_index: None
             };
             // Read a single column
             let record_batch = read_record_batch(

@@ -37,6 +37,7 @@ fn schema_destructure() {
     let Schema {
         mut fields,
         metadata,
+        ..
     } = schema;
     fields.push(Field::new("c2", DataType::Utf8, false));
 

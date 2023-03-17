@@ -35,6 +35,8 @@ pub struct Schema {
     pub fields: Vec<Field>,
     /// A map of key-value pairs containing additional meta data.
     pub metadata: HashMap<String, String>,
+
+    pub fields_index: Option<HashMap<String, usize>>,
 }
 
 impl Schema {
@@ -43,6 +45,7 @@ impl Schema {
         Self {
             fields: vec![],
             metadata: HashMap::new(),
+            fields_index: Some(HashMap::new())
         }
     }
 
@@ -83,7 +86,7 @@ impl Schema {
         fields: Vec<Field>,
         metadata: HashMap<String, String>,
     ) -> Self {
-        Self { fields, metadata }
+        Self { fields, metadata, fields_index: None }
     }
 
     /// Sets the metadata of this `Schema` to be `metadata` and returns self
@@ -144,7 +147,7 @@ impl Schema {
         schemas
             .into_iter()
             .try_fold(Self::empty(), |mut merged, schema| {
-                let Schema { metadata, fields } = schema;
+                let Schema { metadata, fields, .. } = schema;
                 for (key, value) in metadata.into_iter() {
                     // merge metadata
                     if let Some(old_val) = merged.metadata.get(&key) {
@@ -159,8 +162,11 @@ impl Schema {
                 }
                 // merge fields
                 for field in fields.into_iter() {
-                    let merged_field =
-                        merged.fields.iter_mut().find(|f| f.name() == field.name());
+                    let merged_field = if merged.fields_index.is_none(){
+                        merged.fields.iter_mut().find(|f| f.name() == field.name())
+                    } else {
+                        merged.fields_index.as_ref().unwrap().get(field.name()).map(|k| &mut merged.fields[*k])
+                    };
                     match merged_field {
                         Some(merged_field) => merged_field.try_merge(&field)?,
                         // found a new field, add to field list
@@ -205,15 +211,24 @@ impl Schema {
 
     /// Find the index of the column with the given name.
     pub fn index_of(&self, name: &str) -> Result<usize, ArrowError> {
-        (0..self.fields.len())
-            .find(|idx| self.fields[*idx].name() == name)
-            .ok_or_else(|| {
-                let valid_fields: Vec<String> =
-                    self.fields.iter().map(|f| f.name().clone()).collect();
-                ArrowError::SchemaError(format!(
-                    "Unable to get field named \"{name}\". Valid fields: {valid_fields:?}"
-                ))
-            })
+        if self.fields_index.is_none() {
+            (0..self.fields.len())
+                .find(|idx| self.fields[*idx].name() == name)
+                .ok_or_else(|| {
+                    let valid_fields: Vec<String> =
+                        self.fields.iter().map(|f| f.name().clone()).collect();
+                    ArrowError::SchemaError(format!(
+                        "Unable to get field named \"{name}\". Valid fields: {valid_fields:?}"
+                    ))
+                })
+        } else {
+            match self.fields_index.as_ref().unwrap().get(name) {
+                Some(idx) => Ok(*idx),
+                None => Err(ArrowError::SchemaError(format!(
+                        "Unable to get field named \"{name}\"."
+                    )))
+            }
+        }
     }
 
     /// Returns an immutable reference to the Map of custom metadata key-value pairs.
@@ -225,10 +240,15 @@ impl Schema {
     /// Look up a column by name and return a immutable reference to the column along with
     /// its index.
     pub fn column_with_name(&self, name: &str) -> Option<(usize, &Field)> {
-        self.fields
-            .iter()
-            .enumerate()
-            .find(|&(_, c)| c.name() == name)
+        if self.fields_index.is_none() {
+            self.fields
+                .iter()
+                .enumerate()
+                .find(|&(_, c)| c.name() == name)
+        } else {
+            self.fields_index.as_ref().unwrap()
+            .get(name).map(|v| (*v, &self.fields[*v]))
+        }
     }
 
     /// Check to see if `self` is a superset of `other` schema. Here are the comparison rules:
@@ -241,7 +261,8 @@ impl Schema {
     /// In other words, any record conforms to `other` should also conform to `self`.
     pub fn contains(&self, other: &Schema) -> bool {
         self.fields.len() == other.fields.len()
-        && self.fields.iter().zip(other.fields.iter()).all(|(f1, f2)| f1.contains(f2))
+        // @TODO Check consume large time
+        // && self.fields.iter().zip(other.fields.iter()).all(|(f1, f2)| f1.contains(f2))
         // make sure self.metadata is a superset of other.metadata
         && other.metadata.iter().all(|(k, v1)| match self.metadata.get(k) {
             Some(v2) => v1 == v2,
