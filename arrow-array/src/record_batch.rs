@@ -20,7 +20,7 @@
 
 use crate::{new_empty_array, Array, ArrayRef, StructArray};
 use arrow_schema::{ArrowError, DataType, Field, Schema, SchemaRef};
-use tracing::{span, info, Level};
+use tracing::{span, debug, Level};
 use std::time::Instant;
 use std::ops::Index;
 use std::sync::Arc;
@@ -174,7 +174,7 @@ impl RecordBatch {
             };
             return Err(ArrowError::InvalidArgumentError(err.to_string()));
         }
-        info!("Check all columns have the same row count: {:}", metric.elapsed().as_secs());
+        debug!("Check all columns have the same row count: {:}", metric.elapsed().as_secs());
 
         // function for comparing column type and field type
         // return true if 2 types are not matched
@@ -200,7 +200,7 @@ impl RecordBatch {
             return Err(ArrowError::InvalidArgumentError(format!(
                 "column types must match schema types, expected {field_type:?} but found {col_type:?} at column index {i}")));
         }
-        info!("check that all columns match the schema: {:}", metric.elapsed().as_secs());
+        debug!("check that all columns match the schema: {:}", metric.elapsed().as_secs());
 
         Ok(RecordBatch {
             schema,
