@@ -134,9 +134,6 @@ impl RecordBatch {
         columns: Vec<ArrayRef>,
         options: &RecordBatchOptions,
     ) -> Result<Self, ArrowError> {
-        let _span = span!(Level::INFO, "Try new a RecordBatch").entered();
-        let metric = Instant::now();
-
         // check that number of fields in schema match column length
         if schema.fields().len() != columns.len() {
             return Err(ArrowError::InvalidArgumentError(format!(
@@ -174,7 +171,6 @@ impl RecordBatch {
             };
             return Err(ArrowError::InvalidArgumentError(err.to_string()));
         }
-        debug!("Check all columns have the same row count: {:}", metric.elapsed().as_secs());
 
         // function for comparing column type and field type
         // return true if 2 types are not matched
@@ -200,7 +196,6 @@ impl RecordBatch {
             return Err(ArrowError::InvalidArgumentError(format!(
                 "column types must match schema types, expected {field_type:?} but found {col_type:?} at column index {i}")));
         }
-        debug!("check that all columns match the schema: {:}", metric.elapsed().as_secs());
 
         Ok(RecordBatch {
             schema,
