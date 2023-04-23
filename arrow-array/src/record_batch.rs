@@ -162,15 +162,6 @@ impl RecordBatch {
             }
         }
 
-        if columns.iter().any(|c| c.len() != row_count) {
-            let err = match options.row_count {
-                Some(_) => {
-                    "all columns in a record batch must have the specified row count"
-                }
-                None => "all columns in a record batch must have the same length",
-            };
-            return Err(ArrowError::InvalidArgumentError(err.to_string()));
-        }
 
         // function for comparing column type and field type
         // return true if 2 types are not matched
