@@ -236,12 +236,7 @@ impl FilterBuilder {
     }
 
     /// Create a new [`FilterBuilder`] with specific Strategy
-    pub fn with_strategy(filter: &BooleanArray, strategy: IterationStrategy) -> Self {
-        let filter = match filter.null_count() {
-            0 => BooleanArray::from(filter.data().clone()),
-            _ => prep_null_mask_filter(filter),
-        };
-
+    pub fn with_strategy(filter: BooleanArray, strategy: IterationStrategy) -> Self {
         let count = filter_count(&filter);
         let strategy = IterationStrategy::with_strategy(filter.len(), count, strategy);
 
