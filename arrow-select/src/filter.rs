@@ -235,6 +235,23 @@ impl FilterBuilder {
         }
     }
 
+    /// Create a new [`FilterBuilder`] with specific Strategy
+    pub fn with_strategy(filter: &BooleanArray, strategy: IterationStrategy) -> Self {
+        let filter = match filter.null_count() {
+            0 => BooleanArray::from(filter.data().clone()),
+            _ => prep_null_mask_filter(filter),
+        };
+
+        let count = filter_count(&filter);
+        let strategy = IterationStrategy::with_strategy(filter.len(), count, strategy);
+
+        Self {
+            filter,
+            count,
+            strategy
+        }
+    }
+
     /// Compute an optimised representation of the provided `filter` mask that can be
     /// applied to an array more quickly.
     ///
@@ -267,7 +284,7 @@ impl FilterBuilder {
 
 /// The iteration strategy used to evaluate [`FilterPredicate`]
 #[derive(Debug)]
-enum IterationStrategy {
+pub enum IterationStrategy {
     /// A lazily evaluated iterator of ranges
     SlicesIterator,
     /// A lazily evaluated iterator of indices
@@ -303,6 +320,19 @@ impl IterationStrategy {
             return IterationStrategy::SlicesIterator;
         }
         IterationStrategy::IndexIterator
+    }
+
+    /// With specific strategy
+    fn with_strategy(filter_length: usize, filter_count: usize, strategy: IterationStrategy) -> Self {
+        if filter_length == 0 || filter_count == 0 {
+            return IterationStrategy::None;
+        }
+
+        if filter_count == filter_length {
+            return IterationStrategy::All;
+        }
+
+        strategy
     }
 }
 
