@@ -35,6 +35,12 @@ pub trait OffsetSizeTrait: ArrowNativeType + std::ops::AddAssign + Integer {
     const PREFIX: &'static str;
 }
 
+impl OffsetSizeTrait for i16 {
+    const IS_LARGE: bool = false;
+    const PREFIX: &'static str = "";
+}
+
+
 impl OffsetSizeTrait for i32 {
     const IS_LARGE: bool = false;
     const PREFIX: &'static str = "";
