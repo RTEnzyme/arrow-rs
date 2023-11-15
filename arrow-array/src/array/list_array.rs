@@ -40,7 +40,6 @@ impl OffsetSizeTrait for i16 {
     const PREFIX: &'static str = "";
 }
 
-
 impl OffsetSizeTrait for i32 {
     const IS_LARGE: bool = false;
     const PREFIX: &'static str = "";
